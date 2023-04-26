@@ -57,6 +57,13 @@ struct ContentView: View {
         } //: DISPATCH QUEUE
     } //: LOAD
     
+    func delete(offsets: IndexSet) {
+        withAnimation {
+            notes.remove(atOffsets: offsets)
+            save()
+        }
+    }
+    
     // MARK: - BODY
     var body: some View {
         VStack {
@@ -91,10 +98,33 @@ struct ContentView: View {
             
             Spacer()
             
-            Text("\(notes.count)")
+            if notes.count >= 1 {
+                List {
+                    ForEach(0..<notes.count,id: \.self) { i in
+                        HStack {
+                           Capsule()
+                                .frame(width: 4)
+                                .foregroundColor(.accentColor)
+                            Text(notes[i].text)
+                                .lineLimit(1)
+                                .padding(.leading, 5)
+                        } //: HSTACK
+                    } //: LOOP
+                    .onDelete(perform: delete)
+                }
+            } else {
+                Spacer()
+                Image(systemName: "note.text")
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundColor(.gray)
+                    .opacity(0.25)
+                    .padding(25)
+                Spacer()
+            } //: LIST
             
         } //: VSTACK
-        .navigationTitle("Notes")
+        //.navigationTitle("Notes")
         .onAppear(perform: {
             load()
         })
